@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-import stubPhotos from 'utils/stubdata';
+import { stubPhotos } from 'utils/stubdata';
 import homePageReducer from '../reducer';
 
 import { getPhotos, getPhotosSuccess, getPhotosError } from '../actions';

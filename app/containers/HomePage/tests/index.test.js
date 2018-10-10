@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { Spin } from 'antd';
-import stubPhotos from 'utils/stubdata';
+import { stubPhotos } from 'utils/stubdata';
 import { HomePage } from '../index';
 
 describe('<HomePage />', () => {
