@@ -21,7 +21,11 @@ import Photo from 'components/Photo';
 import reducer from './reducer';
 import saga from './saga';
 
-import { makeSelectLoading, makeSelectPhotos } from './selectors';
+import {
+  makeSelectLoading,
+  makeSelectPhotos,
+  makeSelectTotalPages,
+} from './selectors';
 import { getPhotos as getPhotosAction } from './actions';
 
 const Wrapper = styled.div`
@@ -29,53 +33,68 @@ const Wrapper = styled.div`
 `;
 
 const PhotoWrapper = styled.ul`
-  padding-left: 10px;
+  padding-left: 5px;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 20px;
 `;
 
-const LoadingWrapper = styled.div`
+const FooterWrapper = styled.div`
   text-align: center;
   border-radius: 4px;
-  margin-bottom: 20px;
   padding: 30px 50px;
   margin: 20px 0;
 `;
 
+const EndSearchText = styled.span`
+  font-size: 36px;
+  font-weight: 500;
+`;
+
+const defaultValues = {
+  page: 0,
+  pageSize: 20,
+  query: undefined,
+};
+
 /* eslint-disable react/prefer-stateless-function, react/no-array-index-key */
 export class HomePage extends React.PureComponent {
   state = {
-    page: 0,
-    orderBy: 'latest',
+    ...defaultValues,
     scrolling: false,
   };
 
   componentDidMount() {
-    this.props.getPhotos();
+    const { getPhotos } = this.props;
+    const { page, pageSize, query } = this.state;
+    getPhotos(page, pageSize, query);
 
     this.scrollListener = window.addEventListener('scroll', e => {
       this.handleScroll(e);
     });
   }
 
-  changeFilter = orderBy => {
+  changeFilter = (val, key) => {
     const { getPhotos } = this.props;
-    this.setState({ orderBy, page: 0 }, () => {
-      getPhotos(0, orderBy);
+    // reset page back to 0 everytime query or pageSize is changed.
+    this.setState({ [key]: val, page: 0 }, () => {
+      const { page, pageSize, query } = this.state;
+      getPhotos(page, pageSize, query);
     });
   };
 
   handleScroll = () => {
+    const { totalPages } = this.props;
     const { page, scrolling } = this.state;
     if (scrolling) return;
-    if (page > 10) return;
+    // avoid making more request if page exceeds totalPages
+    if (page > totalPages) return;
 
     const lastLi = document.querySelector('ul.photos > li:last-child');
     const lastLiOffset = lastLi.offsetTop + lastLi.clientHeight;
     const pageOffset = window.pageYOffset + window.innerHeight;
-    const bottomOffset = 79;
+    const bottomOffset = 69;
     if (pageOffset > lastLiOffset + bottomOffset) {
       this.loadMore();
     }
@@ -88,19 +107,23 @@ export class HomePage extends React.PureComponent {
         page: prevState.page + 1,
       }),
       () => {
-        const { page, orderBy } = this.state;
-        getPhotos(page, orderBy);
+        const { page, pageSize, query } = this.state;
+        getPhotos(page, pageSize, query);
       },
     );
   }
 
   render() {
-    const { photos, loading } = this.props;
-    const { orderBy } = this.state;
+    const { totalPages, photos, loading } = this.props;
+    const { page, query, pageSize } = this.state;
 
     return (
       <Wrapper>
-        <Filter orderBy={orderBy} changeFilter={this.changeFilter} />
+        <Filter
+          query={query}
+          pageSize={pageSize}
+          changeFilter={this.changeFilter}
+        />
         <PhotoWrapper className="photos">
           {photos.map((photo, i) => (
             <Photo key={photo.id + i} photo={photo}>
@@ -108,10 +131,15 @@ export class HomePage extends React.PureComponent {
             </Photo>
           ))}
         </PhotoWrapper>
+        {page > totalPages && (
+          <FooterWrapper>
+            <EndSearchText className="end-text">End of search</EndSearchText>
+          </FooterWrapper>
+        )}
         {loading && (
-          <LoadingWrapper>
+          <FooterWrapper>
             <Spin />
-          </LoadingWrapper>
+          </FooterWrapper>
         )}
       </Wrapper>
     );
@@ -122,16 +150,19 @@ HomePage.propTypes = {
   getPhotos: PropTypes.func.isRequired,
   photos: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
+  totalPages: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
   loading: makeSelectLoading(),
   photos: makeSelectPhotos(),
+  totalPages: makeSelectTotalPages(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    getPhotos: (page, orderBy) => dispatch(getPhotosAction(page, orderBy)),
+    getPhotos: (page, pageSize, query) =>
+      dispatch(getPhotosAction(page, pageSize, query)),
   };
 }
 

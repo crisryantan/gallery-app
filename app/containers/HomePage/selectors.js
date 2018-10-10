@@ -19,8 +19,16 @@ const makeSelectPhotos = () =>
     substate.get('photos').toJS(),
   );
 
+const makeSelectTotalPages = () =>
+  createSelector(selectHomePageDomain, substate => substate.get('totalPages'));
+
 const makeSelectHomePage = () =>
   createSelector(selectHomePageDomain, substate => substate.toJS());
 
 export default makeSelectHomePage;
-export { selectHomePageDomain, makeSelectLoading, makeSelectPhotos };
+export {
+  selectHomePageDomain,
+  makeSelectLoading,
+  makeSelectPhotos,
+  makeSelectTotalPages,
+};

@@ -4,17 +4,20 @@ import Filter from '../index';
 
 describe('<Filter />', () => {
   let subject = null;
-  let orderBy;
+  let query;
   let changeFilter;
+  let pageSize;
 
   beforeEach(() => {
-    orderBy = 'Latest';
+    query = 'Latest';
+    pageSize = 20;
     changeFilter = jest.fn();
   });
 
   const buildSubject = customProps => {
     const props = {
-      orderBy,
+      query,
+      pageSize,
       changeFilter,
     };
     return shallow(<Filter {...Object.assign({}, props, customProps)} />);
@@ -27,7 +30,7 @@ describe('<Filter />', () => {
 
   it('should call changeFilter successfully', () => {
     subject = buildSubject();
-    subject.instance().handleChange();
+    subject.instance().handleChange(40, 'pageSize');
     expect(changeFilter).toBeCalled();
   });
 });

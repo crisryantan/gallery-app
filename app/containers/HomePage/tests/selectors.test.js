@@ -4,12 +4,14 @@ import {
   selectHomePageDomain,
   makeSelectLoading,
   makeSelectPhotos,
+  makeSelectTotalPages,
 } from '../selectors';
 
 describe('selectHomepage', () => {
   it('should select the homePage state', () => {
     const homePageState = fromJS({
       photos: [],
+      totalPages: 0,
       loading: false,
     });
     const mockedState = fromJS({
@@ -42,5 +44,18 @@ describe('makeSelectPhotos', () => {
       },
     });
     expect(selector(mockedState)).toEqual(photos);
+  });
+});
+
+describe('makeSelectTotalPages', () => {
+  const selector = makeSelectTotalPages();
+  it('should select the photos state', () => {
+    const totalPages = 0;
+    const mockedState = fromJS({
+      homepage: {
+        totalPages,
+      },
+    });
+    expect(selector(mockedState)).toEqual(totalPages);
   });
 });

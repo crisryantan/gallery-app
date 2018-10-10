@@ -6,25 +6,27 @@ describe('HomePage actions', () => {
   describe('getPhotos', () => {
     it('has a type of GET_PHOTOS', () => {
       const page = 1;
-      const orderBy = 'oldest';
+      const pageSize = 20;
+      const query = 'oldest';
       const expected = {
         type: GET_PHOTOS,
         page,
-        orderBy,
+        pageSize,
+        query,
       };
 
-      expect(getPhotos(page, orderBy)).toEqual(expected);
+      expect(getPhotos(page, pageSize, query)).toEqual(expected);
     });
   });
 
   describe('getPhotosSuccess', () => {
     it('has a type of GET_PHOTOS_SUCCESS', () => {
-      const photos = [];
+      const data = {};
       const expected = {
         type: GET_PHOTOS_SUCCESS,
-        photos,
+        data,
       };
-      expect(getPhotosSuccess(photos)).toEqual(expected);
+      expect(getPhotosSuccess(data)).toEqual(expected);
     });
   });
 

@@ -6,18 +6,19 @@
 
 import { GET_PHOTOS, GET_PHOTOS_SUCCESS, GET_PHOTOS_ERROR } from './constants';
 
-export function getPhotos(page = '0', orderBy = 'latest') {
+export function getPhotos(page = '0', pageSize, query) {
   return {
     type: GET_PHOTOS,
     page,
-    orderBy,
+    pageSize,
+    query,
   };
 }
 
-export function getPhotosSuccess(photos) {
+export function getPhotosSuccess(data) {
   return {
     type: GET_PHOTOS_SUCCESS,
-    photos,
+    data,
   };
 }
 

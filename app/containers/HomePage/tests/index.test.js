@@ -1,7 +1,7 @@
-import { fromJS } from 'immutable';
-import homePageReducer from '../reducer';
-
-import { getPhotos, getPhotosSuccess, getPhotosError } from '../actions';
+import React from 'react';
+import { shallow } from 'enzyme';
+import { Spin } from 'antd';
+import { HomePage } from '../index';
 
 const stubPhotos = [
   {
@@ -36,80 +36,57 @@ const stubPhotos = [
   },
 ];
 
-describe('homePageReducer', () => {
-  let state;
+describe('<HomePage />', () => {
+  let subject = null;
+  let getPhotos;
+  let photos;
+  let loading;
+  let totalPages;
 
-  describe('homePageReducer - no photos', () => {
-    beforeEach(() => {
-      state = fromJS({
-        photos: [],
-        totalPages: 0,
-        loading: false,
-      });
-    });
-
-    it('returns the initial state', () => {
-      expect(homePageReducer(undefined, {})).toEqual(state);
-    });
-
-    it('should handle the getPhotos action correctly', () => {
-      const expectedResult = fromJS({
-        photos: [],
-        totalPages: 0,
-        loading: true,
-      });
-      expect(homePageReducer(state, getPhotos(1, 'oldest'))).toEqual(
-        expectedResult,
-      );
-    });
-
-    it('should handle the getPhotosSuccess action correctly', () => {
-      const data = {
-        results: stubPhotos,
-        total_pages: 10,
-      };
-
-      const expectedResult = fromJS({
-        photos: stubPhotos,
-        totalPages: 10,
-        loading: false,
-      });
-      expect(homePageReducer(state, getPhotosSuccess(data))).toEqual(
-        expectedResult,
-      );
-    });
-
-    it('should handle the getPhotosError action correctly', () => {
-      const err = 'Something went wrong';
-      const expectedResult = fromJS({
-        photos: [],
-        totalPages: 0,
-        loading: false,
-      });
-      expect(homePageReducer(state, getPhotosError(err))).toEqual(
-        expectedResult,
-      );
-    });
+  beforeEach(() => {
+    getPhotos = jest.fn();
+    photos = stubPhotos;
+    loading = false;
+    totalPages = 10;
   });
 
-  describe('homePageReducer - with photos', () => {
-    beforeEach(() => {
-      state = fromJS({
-        photos: stubPhotos,
-        totalPages: 0,
-        loading: false,
-      });
-    });
+  const buildSubject = customProps => {
+    const props = {
+      getPhotos,
+      photos,
+      loading,
+      totalPages,
+    };
+    return shallow(<HomePage {...Object.assign({}, props, customProps)} />);
+  };
 
-    it('should handle the getPhotos action correctly and empty photos', () => {
-      const expectedResult = fromJS({
-        photos: [],
-        totalPages: 0,
-        loading: true,
-      });
-      expect(homePageReducer(state, getPhotos(0, 'popular'))).toEqual(
-        expectedResult,
-      );
-    });
+  it('renders a <HomePage> ', () => {
+    subject = buildSubject();
+    expect(subject.find(HomePage)).toBeDefined();
+  });
+
+  it('should render <Spin> when loading is true', () => {
+    subject = buildSubject({ loading: true });
+    expect(subject.find(Spin)).toBeDefined();
+  });
+
+  it('should render <EndSearchText /> span ', () => {
+    subject = buildSubject();
+    subject.setState({ page: 11 });
+    expect(subject.find('.end-text')).toBeDefined();
+  });
+
+  it('should successfully call getPhotos api', () => {
+    subject = buildSubject();
+    subject.instance().loadMore();
+    expect(getPhotos).toBeCalled();
+  });
+
+  it('should successfully changeFilter and call getPhotos', () => {
+    const pageSize = 40;
+    subject = buildSubject();
+    subject.instance().changeFilter(pageSize, 'pageSize');
+    expect(subject.state().pageSize).toEqual(pageSize);
+    expect(getPhotos).toBeCalled();
   });
 });

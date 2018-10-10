@@ -11,11 +11,12 @@ import styled from 'styled-components';
 const StyledLi = styled.li`
   padding: 10px;
   flex-grow: 1;
-  width: calc(33% - 20px);
-  margin-right: 10px;
-  margin-bottom: 10px;
+  width: calc(33% - 10px);
+  margin-right: 5px;
+  margin-bottom: 5px;
   height: 200px;
   background: ${props => `url(${props.image})`} no-repeat center;
+  border: 1px solid;
 
   @media (max-width: 766px) {
     height: 100px;

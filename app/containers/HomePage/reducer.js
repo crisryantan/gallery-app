@@ -1,6 +1,6 @@
 /*
  *
- * HomePage2 reducer
+ * HomePage reducer
  *
  */
 
@@ -10,8 +10,10 @@ import { GET_PHOTOS, GET_PHOTOS_SUCCESS, GET_PHOTOS_ERROR } from './constants';
 export const initialState = fromJS({
   photos: [],
   loading: false,
+  totalPages: 0,
 });
 
+/* eslint-disable camelcase */
 function homePageReducer(state = initialState, action) {
   switch (action.type) {
     case GET_PHOTOS: {
@@ -24,9 +26,11 @@ function homePageReducer(state = initialState, action) {
     }
 
     case GET_PHOTOS_SUCCESS: {
+      const { results, total_pages } = action.data;
       return state
         .set('loading', false)
-        .set('photos', state.get('photos').concat(fromJS(action.photos)));
+        .set('totalPages', total_pages)
+        .set('photos', state.get('photos').concat(fromJS(results)));
     }
 
     case GET_PHOTOS_ERROR: {
