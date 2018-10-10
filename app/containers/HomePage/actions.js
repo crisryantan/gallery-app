@@ -6,7 +6,7 @@
 
 import { GET_PHOTOS, GET_PHOTOS_SUCCESS, GET_PHOTOS_ERROR } from './constants';
 
-export function getPhotos(page = '1', orderBy = 'latest') {
+export function getPhotos(page = '0', orderBy = 'latest') {
   return {
     type: GET_PHOTOS,
     page,

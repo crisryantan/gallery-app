@@ -13,5 +13,7 @@ const clientId =
 // How to sort the photos. Optional. (Valid values: latest, oldest, popular; default: latest)
 export const getPhotos = ({ page, orderBy }) =>
   axiosInstance
-    .get(`/photos/?page=${page}&order_by=${orderBy}&client_id=${clientId}`)
+    .get(
+      `/photos/?page=${page}&order_by=${orderBy}&per_page=18&client_id=${clientId}`,
+    )
     .then(response => response.data);

@@ -14,11 +14,19 @@ export const initialState = fromJS({
 
 function homePageReducer(state = initialState, action) {
   switch (action.type) {
-    case GET_PHOTOS:
+    case GET_PHOTOS: {
+      const { page } = action;
+      // reset list of photos, means there is change of filter
+      if (page === 0) {
+        return state.set('loading', true).set('photos', fromJS([]));
+      }
       return state.set('loading', true);
+    }
 
     case GET_PHOTOS_SUCCESS: {
-      return state.set('loading', false).set('photos', fromJS(action.photos));
+      return state
+        .set('loading', false)
+        .set('photos', state.get('photos').concat(fromJS(action.photos)));
     }
 
     case GET_PHOTOS_ERROR: {

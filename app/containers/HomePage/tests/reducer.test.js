@@ -39,43 +39,68 @@ const stubPhotos = [
 describe('homePageReducer', () => {
   let state;
 
-  beforeEach(() => {
-    state = fromJS({
-      photos: [],
-      loading: false,
+  describe('homePageReducer - no photos', () => {
+    beforeEach(() => {
+      state = fromJS({
+        photos: [],
+        loading: false,
+      });
+    });
+
+    it('returns the initial state', () => {
+      expect(homePageReducer(undefined, {})).toEqual(state);
+    });
+
+    it('should handle the getPhotos action correctly', () => {
+      const expectedResult = fromJS({
+        photos: [],
+        loading: true,
+      });
+      expect(homePageReducer(state, getPhotos(1, 'oldest'))).toEqual(
+        expectedResult,
+      );
+    });
+
+    it('should handle the getPhotosSuccess action correctly', () => {
+      const photos = stubPhotos;
+
+      const expectedResult = fromJS({
+        photos,
+        loading: false,
+      });
+      expect(homePageReducer(state, getPhotosSuccess(photos))).toEqual(
+        expectedResult,
+      );
+    });
+
+    it('should handle the getPhotosError action correctly', () => {
+      const err = 'Something went wrong';
+      const expectedResult = fromJS({
+        photos: [],
+        loading: false,
+      });
+      expect(homePageReducer(state, getPhotosError(err))).toEqual(
+        expectedResult,
+      );
     });
   });
 
-  it('returns the initial state', () => {
-    expect(homePageReducer(undefined, {})).toEqual(state);
-  });
-
-  it('should handle the getPhotos action correctly', () => {
-    const expectedResult = fromJS({
-      photos: [],
-      loading: true,
+  describe('homePageReducer - with photos', () => {
+    beforeEach(() => {
+      state = fromJS({
+        photos: stubPhotos,
+        loading: false,
+      });
     });
-    expect(homePageReducer(state, getPhotos())).toEqual(expectedResult);
-  });
 
-  it('should handle the getPhotosSuccess action correctly', () => {
-    const photos = stubPhotos;
-
-    const expectedResult = fromJS({
-      photos,
-      loading: false,
+    it('should handle the getPhotos action correctly and empty photos', () => {
+      const expectedResult = fromJS({
+        photos: [],
+        loading: true,
+      });
+      expect(homePageReducer(state, getPhotos(0, 'popular'))).toEqual(
+        expectedResult,
+      );
     });
-    expect(homePageReducer(state, getPhotosSuccess(photos))).toEqual(
-      expectedResult,
-    );
-  });
-
-  it('should handle the getPhotosError action correctly', () => {
-    const err = 'Something went wrong';
-    const expectedResult = fromJS({
-      photos: [],
-      loading: false,
-    });
-    expect(homePageReducer(state, getPhotosError(err))).toEqual(expectedResult);
   });
 });
